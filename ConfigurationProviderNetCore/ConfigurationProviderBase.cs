@@ -70,7 +70,7 @@ namespace ConfigurationProviderNetCore
         }
 
         /// <summary>
-        /// This property returns a bool indicating whether or not to send notifications on successfull uploads
+        /// This property returns a <see cref="bool" /> indicating whether or not to send notifications on successfull uploads
         /// of videos and other assets.
         /// This property is Optional.
         /// If no config setting is found (in production there is no need for this setting to be present) this property
