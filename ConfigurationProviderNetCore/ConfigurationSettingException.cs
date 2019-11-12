@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConfigurationProviderNetCore
 {
 
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public sealed class ConfigurationSettingException : Exception
     {
         public ConfigurationSettingException() { }

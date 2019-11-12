@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConfigurationProviderNetCore
 {
+    [ExcludeFromCodeCoverage]
     internal static class Program
     {
         static void Main(string[] args)

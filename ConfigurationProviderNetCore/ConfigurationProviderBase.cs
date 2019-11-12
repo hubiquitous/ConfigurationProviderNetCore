@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 
 namespace ConfigurationProviderNetCore
 {
@@ -75,7 +74,7 @@ namespace ConfigurationProviderNetCore
         /// This property is Optional.
         /// If no config setting is found (in production there is no need for this setting to be present) this property
         /// should return true
-        /// If the setting is not a valid bool, and exception should be thrown
+        /// If the setting is not a valid bool, an exception should be thrown
         /// </summary>
         public bool NotifyOnUpload
         {
@@ -86,7 +85,7 @@ namespace ConfigurationProviderNetCore
             }
         }
 
-        private bool EnsureNotifyOnLoadIsValidBool(string notifyOnUploadAsConfigured)
+        private static bool EnsureNotifyOnLoadIsValidBool(string notifyOnUploadAsConfigured)
         {
             if (string.IsNullOrWhiteSpace(notifyOnUploadAsConfigured))
             {
@@ -128,20 +127,17 @@ namespace ConfigurationProviderNetCore
         {
             var configurationSettingState = ConfigurationSettingState.IsPresent;
 
-            if (string.IsNullOrWhiteSpace(configurationValue))
+            if (configurationValue == null)
             {
-                if (configurationValue == null)
-                {
-                    configurationSettingState = ConfigurationSettingState.IsNull;
-                }
-                else
-                {
-                    configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;
-                }
+                configurationSettingState = ConfigurationSettingState.IsNull;
             }
             else if (configurationValue.Length == 0)
             {
                 configurationSettingState = ConfigurationSettingState.IsEmpty;
+            }
+            else if (IsWhiteSpaces(configurationValue))
+            {
+                configurationSettingState = ConfigurationSettingState.IsWhiteSpaces;
             }
 
             if (configurationSettingState != ConfigurationSettingState.IsPresent)
@@ -150,34 +146,18 @@ namespace ConfigurationProviderNetCore
             }
         }
 
-        protected static void EnsureProviderNameIsPresent(string connectionStringName, string providerName)
+        private static bool IsWhiteSpaces(string value)
         {
-            EnsureConfigSettingIsPresent(providerName, configurationSettingState =>
-            {
-                switch (configurationSettingState)
-                {
-                    case ConfigurationSettingState.IsWhiteSpaces:
-                        return new ConfigurationSettingException($"The value of the providerName attribute for ConnectionString setting Name: {connectionStringName} is Blank (only spaces). This setting is a Required setting");
-                    case ConfigurationSettingState.IsEmpty:
-                    default:
-                        return new ConfigurationSettingException($"The value of the providerName attribute for ConnectionString setting Name: {connectionStringName} is Empty. This setting is a Required setting");
-                }
-            });
-        }
 
-        protected static void EnsureConnectionStringIsPresent(string connectionStringName, string connectionString)
-        {
-            EnsureConfigSettingIsPresent(connectionString, configurationSettingState =>
+            for (int i = 0; i < value.Length; i++)
             {
-                switch (configurationSettingState)
+                if (!Char.IsWhiteSpace(value[i]))
                 {
-                    case ConfigurationSettingState.IsWhiteSpaces:
-                        return new ConfigurationSettingException($"The value of the connectionString attribute for ConnectionString setting Name: {connectionStringName} is Blank (only spaces). This setting is a Required setting");
-                    case ConfigurationSettingState.IsEmpty:
-                    default:
-                        return new ConfigurationSettingException($"The value of the connectionString attribute for ConnectionString setting Name: {connectionStringName} is Empty. This setting is a Required setting");
+                    return false;
                 }
-            });
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -196,12 +176,12 @@ namespace ConfigurationProviderNetCore
                 switch (configurationSettingState)
                 {
                     case ConfigurationSettingState.IsNull:
-                        return new ConfigurationSettingException($"The AppSettings Key: {configurationSettingKey} is Missing in the configuration file. This setting is a Required setting");
+                        return new ConfigurationSettingException($"Either the AppSettings Key: {configurationSettingKey}, is Missing or the value is Missing in the configuration file. This setting is a Required setting");
                     case ConfigurationSettingState.IsWhiteSpaces:
-                        return new ConfigurationSettingException($"The value of AppSettings Key: {configurationSettingKey} in the configuration file is Blank (only spaces). This setting is a Required setting");
+                        return new ConfigurationSettingException($"The value of the AppSettings Key: {configurationSettingKey} in the configuration file is White Spaces. This setting is a Required setting");
                     case ConfigurationSettingState.IsEmpty:
                     default:
-                        return new ConfigurationSettingException($"The value of AppSettings Key: {configurationSettingKey} in the configuration file is Empty. This setting is a Required setting");
+                        return new ConfigurationSettingException($"The value of the AppSettings Key: {configurationSettingKey} in the configuration file is Empty. This setting is a Required setting");
                 }
             });
 

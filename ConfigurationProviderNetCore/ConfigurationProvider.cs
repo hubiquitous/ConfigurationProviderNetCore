@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ConfigurationProviderNetCore
 {
@@ -10,6 +9,7 @@ namespace ConfigurationProviderNetCore
         private const string appSettingsSection = "AppSettings";
         private readonly IConfigurationRoot _configurationRoot;
 
+        [ExcludeFromCodeCoverage]
         public ConfigurationProvider()
         {
             var configurationBuilder = new ConfigurationBuilder();
